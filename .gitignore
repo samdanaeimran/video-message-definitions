@@ -1,0 +1,8 @@
+# C++ and C# build output and generated proto code
+cpp/build/
+csharp/obj/
+csharp/bin/
+*.pb.h
+*.pb.cc
+*.g.cs
+*.pb.cs

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package mysystem;
+
+message DeviceStatus {
+  string device_id = 1;
+  uint32 battery_level = 2;
+  bool is_online = 3;
+}
+
+service DeviceService {
+  rpc GetStatus(DeviceStatusRequest) returns (DeviceStatus);
+}
+
+message DeviceStatusRequest {
+  string device_id = 1;
+}

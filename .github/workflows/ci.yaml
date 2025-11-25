@@ -1,0 +1,67 @@
+name: Build and Test
+
+on:
+  push:
+    paths:
+      - 'protos/**'
+      - 'cpp/**'
+      - 'csharp/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    paths:
+      - 'protos/**'
+      - 'cpp/**'
+      - 'csharp/**'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  build-cpp:
+    name: "Build C++"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler cmake g++ build-essential
+
+      - name: Configure CMake project
+        run: |
+          cd cpp
+          mkdir build
+          cd build
+          cmake ..
+
+      - name: Compile
+        run: |
+          cd cpp/build
+          make
+
+      - name: Run example
+        run: |
+          cd cpp/build
+          ./firmware
+
+  build-csharp:
+    name: "Build C#"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build
+        run: |
+          cd csharp
+          dotnet build --configuration Release
+
+      - name: Run
+        run: |
+          cd csharp
+          dotnet run

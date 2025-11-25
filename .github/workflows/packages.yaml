@@ -1,0 +1,65 @@
+name: Publish Proto Packages
+
+on:
+  push:
+    tags:
+      - 'v*'    # Triggers only on version tags like v1.0.0, v2.1, etc.
+
+jobs:
+  publish-nuget:
+    name: Publish NuGet Proto Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install NuGet CLI
+        run: dotnet tool install --global nuget-commandline
+
+      - name: Pack NuGet proto package
+        run: |
+          cd protos
+          nuget pack protos.nuspec -Version ${GITHUB_REF#refs/tags/v}
+      - name: Publish NuGet proto package
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          cd protos
+          nuget push MyCompany.ProtoDefinitions.*.nupkg -ApiKey $NUGET_API_KEY -Source https://api.nuget.org/v3/index.json
+
+  publish-conan:
+    name: Publish Conan Proto Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Conan
+        run: pip install conan
+
+      - name: Set PACKAGE_VERSION
+        run: echo "PACKAGE_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Conan export
+        run: |
+          cd protos
+          # Set user/channel for your Conan remote
+          conan export . --name=myproto --version="${PACKAGE_VERSION}" --user=${{ secrets.CONAN_USERNAME }} --channel=stable
+
+      - name: Conan upload
+        env:
+          CONAN_USERNAME: ${{ secrets.CONAN_USERNAME }}
+          CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}
+          CONAN_REMOTE: ${{ secrets.CONAN_REMOTE }}
+        run: |
+          cd protos
+          conan remote add myremote $CONAN_REMOTE || true
+          conan user -p $CONAN_PASSWORD -r myremote $CONAN_USERNAME
+          conan upload myproto/${PACKAGE_VERSION}@${CONAN_USERNAME}/stable --all -r=myremote --confirm

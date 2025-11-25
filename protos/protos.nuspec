@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>MyCompany.ProtoDefinitions</id>
+    <version>1.0.0</version>
+    <authors>YourName</authors>
+    <description>Shared .proto definitions for MyCompany projects</description>
+  </metadata>
+  <files>
+    <file src="*.proto" target="contentFiles/any/any/protos/" />
+  </files>
+</package>
