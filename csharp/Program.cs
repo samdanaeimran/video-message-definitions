@@ -5,7 +5,7 @@ class Program
 {
     static void Main()
     {
-        var status = new DeviceStatus
+        var status = new TestingDeviceStatus
         {
             DeviceId = "abc123",
             BatteryLevel = 78,
