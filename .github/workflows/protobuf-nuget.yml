@@ -1,0 +1,41 @@
+name: Build and Pack Protobuf Nuget with OIDC
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build project (compiles proto files)
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Generate NuGet package
+      run: dotnet pack --configuration Release --no-build --output ./packages
+
+    - name: Upload NuGet package as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-package
+        path: ./packages/*.nupkg
+        retention-days: 5
+        
+    - name: Push to NuGet.org using OIDC
+      run: dotnet nuget push ./packages/*.nupkg --source api.nuget.org
