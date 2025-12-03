@@ -12,3 +12,5 @@ int main() {
     std::cout << "Online: " << (status.is_online() ? "yes" : "no") << "\n";
     return 0;
 }
+
+// this is a comment
