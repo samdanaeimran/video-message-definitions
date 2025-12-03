@@ -15,5 +15,9 @@ class Program
         Console.WriteLine($"Device ID: {status.DeviceId}");
         Console.WriteLine($"Battery: {status.BatteryLevel}%");
         Console.WriteLine($"Online: {(status.IsOnline ? "yes" : "no")}");
+        
+        Console.WriteLine($"Device ID: {status.DeviceId}");
+        Console.WriteLine($"Battery: {status.BatteryLevel}%");
+        Console.WriteLine($"Online: {(status.IsOnline ? "yes" : "no")}");
     }
 }
